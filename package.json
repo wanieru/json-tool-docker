@@ -1,0 +1,35 @@
+{
+  "name": "json-tool-docker",
+  "version": "1.0.0",
+  "description": "json-tool-docker",
+  "scripts": {
+    "start": "node dist/index.js",
+    "build": "tsc",
+    "watch": "tsc --watch",
+    "webpack-d": "webpack --mode=development --watch",
+    "webpack-p": "webpack --mode=production"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wanieru/json-tool-docker.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/wanieru/json-tool-docker/issues"
+  },
+  "homepage": "https://github.com/wanieru/json-tool-docker#readme",
+  "dependencies": {
+    "@types/express": "^4.17.13",
+    "@types/hat": "^0.0.1",
+    "@types/node": "^16.11.12",
+    "express": "^4.17.1",
+    "hat": "^0.0.3",
+    "ts-loader": "^9.4.1",
+    "typescript": "^4.5.3",
+    "webpack": "^5.75.0",
+    "webpack-cli": "^5.0.0",
+    "tsch": "github:wanieru/tsch",
+    "json-tool": "github:wanieru/json-tool"
+  }
+}

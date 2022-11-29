@@ -1,0 +1,75 @@
+{
+  "name": "Build and push",
+  "on": {
+    "push": {
+      "branches": [
+        "main"
+      ],
+      "tags": [
+        "v*"
+      ]
+    },
+    "workflow_dispatch": null
+  },
+  "jobs": {
+    "build": {
+      "name": "Build JS and push docker image",
+      "runs-on": "ubuntu-latest",
+      "env": {
+        "NODE_OPTIONS": "--max_old_space_size=4096"
+      },
+      "steps": [
+        {
+          "uses": "actions/checkout@v2"
+        },
+        {
+          "uses": "actions/setup-node@v1",
+          "with": {
+            "node-version": 15
+          }
+        },
+        {
+          "uses": "actions/cache@v2",
+          "id": "cache-npm-ui",
+          "with": {
+            "path": "~/.npm",
+            "key": "${{ runner.os }}-node-${{ hashFiles('package-lock.json') }}",
+            "restore-keys": "${{ runner.os }}-node-\n"
+          }
+        },
+        {
+          "name": "npm install dependencies",
+          "run": "npm ci --only=production\n"
+        },
+        {
+          "name": "npm build",
+          "run": "npm run build\n"
+        },
+        {
+          "name": "npm build webpack",
+          "run": "npm run webpack-p\n"
+        },
+        {
+          "name": "Login to Docker Hub",
+          "uses": "docker/login-action@v1",
+          "with": {
+            "username": "${{ secrets.DOCKER_HUB_USERNAME }}",
+            "password": "${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}"
+          }
+        },
+        {
+          "name": "Set up Docker Buildx",
+          "id": "buildx",
+          "uses": "docker/setup-buildx-action@v1"
+        },
+        {
+          "name": "Build the Docker image and push",
+          "env": {
+            "DOCKER_PLATFORM": "linux/amd64,linux/arm/v7,linux/arm64/v8"
+          },
+          "run": "echo ${{secrets.DOCKER_HUB_ACCESS_TOKEN}} | docker login -u ${{secrets.DOCKER_HUB_USERNAME}} --password-stdin\nGIT_SHA=$(git rev-parse --short HEAD)\ndocker buildx build --platform ${DOCKER_PLATFORM} --tag ${{secrets.DOCKER_HUB_REPO}}:sha-${GIT_SHA} --tag ${{secrets.DOCKER_HUB_REPO}}:latest -f ./.github/workflows/Dockerfile --push .\n"
+        }
+      ]
+    }
+  }
+}
