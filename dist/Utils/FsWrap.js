@@ -64,6 +64,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.FsWrap = void 0;
 var fs = __importStar(require("fs/promises"));
+var fssync = __importStar(require("fs"));
 var path_1 = __importDefault(require("path"));
 var FsWrap = /** @class */ (function () {
     function FsWrap() {
@@ -115,6 +116,32 @@ var FsWrap = /** @class */ (function () {
                     case 1:
                         buffer = _a.sent();
                         return [2 /*return*/, buffer.toString()];
+                }
+            });
+        });
+    };
+    FsWrap.saveFile = function (file, data) {
+        return __awaiter(this, void 0, void 0, function () {
+            var dir;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        dir = path_1.default.dirname(file);
+                        if (!!fssync.existsSync(dir)) return [3 /*break*/, 2];
+                        return [4 /*yield*/, fs.mkdir(dir)];
+                    case 1:
+                        _a.sent();
+                        _a.label = 2;
+                    case 2:
+                        if (!fssync.existsSync(file)) return [3 /*break*/, 4];
+                        return [4 /*yield*/, fs.rm(file)];
+                    case 3:
+                        _a.sent();
+                        _a.label = 4;
+                    case 4: return [4 /*yield*/, fs.writeFile(file, data)];
+                    case 5:
+                        _a.sent();
+                        return [2 /*return*/];
                 }
             });
         });

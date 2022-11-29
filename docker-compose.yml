@@ -1,0 +1,16 @@
+{
+  "version": "3",
+  "services": {
+    "json-tool-docker": {
+      "restart" : "always",
+      "image": "wanieru/json-tool-docker:latest",
+      "ports": [
+        "5000:5000"
+      ],
+      "volumes":[
+        "./schemas:/app/schemas"
+        "./jsons:/app/jsons"
+      ]
+    }
+  }
+}

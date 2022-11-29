@@ -65,6 +65,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Server = void 0;
 var express = __importStar(require("express"));
 var hat_1 = __importDefault(require("hat"));
+var Schema_1 = require("./Schema");
 var Server = /** @class */ (function () {
     function Server(port) {
         var _this = this;
@@ -84,22 +85,52 @@ var Server = /** @class */ (function () {
     };
     Server.prototype.api = function (req, res) {
         return __awaiter(this, void 0, void 0, function () {
-            var json, no, ok;
-            return __generator(this, function (_a) {
-                json = req.body;
-                no = function (json) {
-                    if (json === void 0) { json = {}; }
-                    res.status(400);
-                    res.json(json);
-                };
-                ok = function (json) {
-                    if (json === void 0) { json = {}; }
-                    res.status(200);
-                    res.json(json);
-                };
-                // if (!json.command)
-                //     return no();
-                return [2 /*return*/, ok()];
+            var json, no, ok, files, schemas, _i, schemas_1, schema, arr, jsons, _a, jsons_1, json_1;
+            return __generator(this, function (_b) {
+                switch (_b.label) {
+                    case 0:
+                        json = req.body;
+                        no = function (json) {
+                            if (json === void 0) { json = {}; }
+                            res.status(400);
+                            res.json(json);
+                        };
+                        ok = function (json) {
+                            if (json === void 0) { json = {}; }
+                            res.status(200);
+                            res.json(json);
+                        };
+                        if (!json.command)
+                            return [2 /*return*/, no()];
+                        if (!(json.command === "list")) return [3 /*break*/, 6];
+                        files = {};
+                        return [4 /*yield*/, Schema_1.Schema.getSchemas()];
+                    case 1:
+                        schemas = _b.sent();
+                        _i = 0, schemas_1 = schemas;
+                        _b.label = 2;
+                    case 2:
+                        if (!(_i < schemas_1.length)) return [3 /*break*/, 5];
+                        schema = schemas_1[_i];
+                        arr = [];
+                        files[schema.getSchemaFile()] = arr;
+                        return [4 /*yield*/, schema.getJsons()];
+                    case 3:
+                        jsons = _b.sent();
+                        for (_a = 0, jsons_1 = jsons; _a < jsons_1.length; _a++) {
+                            json_1 = jsons_1[_a];
+                            arr.push(json_1);
+                        }
+                        _b.label = 4;
+                    case 4:
+                        _i++;
+                        return [3 /*break*/, 2];
+                    case 5: return [2 /*return*/, ok({ schemas: files })];
+                    case 6:
+                        if (json.command === "load")
+                            return [2 /*return*/, ok()];
+                        return [2 /*return*/];
+                }
             });
         });
     };

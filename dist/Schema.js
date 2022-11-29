@@ -40,11 +40,15 @@ exports.Schema = void 0;
 var FsWrap_1 = require("./Utils/FsWrap");
 var tsch_1 = require("tsch");
 var Schema = /** @class */ (function () {
-    function Schema(name, jsonSchema, tsch) {
+    function Schema(schemaFile, name, jsonSchema, tsch) {
+        this.schemaFile = schemaFile;
         this.regex = Schema.getRegex(name);
         this.jsonSchema = jsonSchema;
         this.tsch = tsch;
     }
+    Schema.prototype.getSchemaFile = function () {
+        return this.schemaFile;
+    };
     Schema.prototype.getJsons = function () {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
@@ -115,28 +119,40 @@ var Schema = /** @class */ (function () {
                             schemaFiles = schemaFiles.filter(function (s) { return files.includes(s); });
                         }
                         return [4 /*yield*/, (function () { return __awaiter(_this, void 0, void 0, function () {
-                                var addJsonSchema, addTsch, tsch, _i, schemaFiles_1, file, content;
+                                var _loop_1, _i, schemaFiles_1, file;
                                 return __generator(this, function (_a) {
                                     switch (_a.label) {
                                         case 0:
-                                            addJsonSchema = function (name, jsonSchema) { return Schema.addJsonSchema(result, name, jsonSchema); };
-                                            addTsch = function (name, tsch) { return Schema.addTsch(result, name, tsch); };
-                                            tsch = tsch_1.tsch;
+                                            _loop_1 = function (file) {
+                                                var addJsonSchema, addTsch, tsch, content;
+                                                return __generator(this, function (_b) {
+                                                    switch (_b.label) {
+                                                        case 0:
+                                                            addJsonSchema = function (name, jsonSchema) { return Schema.addJsonSchema(result, file, name, jsonSchema); };
+                                                            addTsch = function (name, tsch) { return Schema.addTsch(result, file, name, tsch); };
+                                                            tsch = tsch_1.tsch;
+                                                            return [4 /*yield*/, FsWrap_1.FsWrap.loadFile(file)];
+                                                        case 1:
+                                                            content = _b.sent();
+                                                            try {
+                                                                "use strict";
+                                                                eval(content);
+                                                            }
+                                                            catch (e) {
+                                                                console.warn("Exception during ".concat(file), e);
+                                                            }
+                                                            return [2 /*return*/];
+                                                    }
+                                                });
+                                            };
                                             _i = 0, schemaFiles_1 = schemaFiles;
                                             _a.label = 1;
                                         case 1:
                                             if (!(_i < schemaFiles_1.length)) return [3 /*break*/, 4];
                                             file = schemaFiles_1[_i];
-                                            return [4 /*yield*/, FsWrap_1.FsWrap.loadFile(file)];
+                                            return [5 /*yield**/, _loop_1(file)];
                                         case 2:
-                                            content = _a.sent();
-                                            try {
-                                                "use strict";
-                                                eval(content);
-                                            }
-                                            catch (e) {
-                                                console.warn("Exception during ".concat(file), e);
-                                            }
+                                            _a.sent();
                                             _a.label = 3;
                                         case 3:
                                             _i++;
@@ -157,11 +173,11 @@ var Schema = /** @class */ (function () {
             .map(function (s) { return s.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&'); })
             .join(".*") + "$");
     };
-    Schema.addJsonSchema = function (schemas, name, jsonSchema) {
-        schemas.push(new Schema(name, jsonSchema));
+    Schema.addJsonSchema = function (schemas, schemaFile, name, jsonSchema) {
+        schemas.push(new Schema(schemaFile, name, jsonSchema));
     };
-    Schema.addTsch = function (schemas, name, tsch) {
-        schemas.push(new Schema(name, undefined, tsch));
+    Schema.addTsch = function (schemas, schemaFile, name, tsch) {
+        schemas.push(new Schema(schemaFile, name, undefined, tsch));
     };
     return Schema;
 }());

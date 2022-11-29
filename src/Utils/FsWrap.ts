@@ -1,4 +1,5 @@
 import * as fs from "fs/promises";
+import * as fssync from "fs";
 import path from "path";
 export class FsWrap
 {
@@ -28,6 +29,15 @@ export class FsWrap
     {
         const buffer = await fs.readFile(file);
         return buffer.toString();
+    }
+    public static async saveFile(file: string, data: string): Promise<void>
+    {
+        const dir = path.dirname(file);
+        if (!fssync.existsSync(dir))
+            await fs.mkdir(dir);
+        if (fssync.existsSync(file))
+            await fs.rm(file);
+        await fs.writeFile(file, data);
     }
     public static async getStat(file: string)
     {
