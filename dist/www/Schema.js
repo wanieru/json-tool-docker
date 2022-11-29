@@ -32,8 +32,8 @@ var Schema = /** @class */ (function () {
     Schema.parseSchema = function (file, content, result) {
         if (!result)
             result = [];
-        var addJsonSchema = function (name, jsonSchema) { return Schema.addJsonSchema(result !== null && result !== void 0 ? result : [], content, file, name, jsonSchema); };
-        var addTsch = function (name, tsch) { return Schema.addTsch(result !== null && result !== void 0 ? result : [], content, file, name, tsch); };
+        var addJsonSchema = function (name, jsonSchema) { return Schema.addJsonSchema(result !== null && result !== void 0 ? result : [], file, content, name, jsonSchema); };
+        var addTsch = function (name, tsch) { return Schema.addTsch(result !== null && result !== void 0 ? result : [], file, content, name, tsch); };
         var tsch = tsch_1.tsch;
         try {
             "use strict";

@@ -38,6 +38,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ServerUtils = void 0;
 var ApiUtils_1 = require("./ApiUtils");
+var Schema_1 = require("./Schema");
 var ServerUtils = /** @class */ (function () {
     function ServerUtils() {
     }
@@ -55,6 +56,7 @@ var ServerUtils = /** @class */ (function () {
     };
     ServerUtils.load = function (schema, json) {
         return __awaiter(this, void 0, void 0, function () {
+            var result;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0: return [4 /*yield*/, ApiUtils_1.ApiUtils.run("/api", {
@@ -62,7 +64,12 @@ var ServerUtils = /** @class */ (function () {
                             schema: schema,
                             json: json
                         })];
-                    case 1: return [2 /*return*/, _a.sent()];
+                    case 1:
+                        result = _a.sent();
+                        if (!result.body.schemaContent)
+                            return [2 /*return*/, null];
+                        result.body.schema = Schema_1.Schema.parseSchema(schema, result.body.schemaContent)[0];
+                        return [2 /*return*/];
                 }
             });
         });

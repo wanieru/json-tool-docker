@@ -1,4 +1,5 @@
 import { ApiUtils } from "./ApiUtils";
+import { Schema } from "./Schema";
 
 export class ServerUtils
 {
@@ -10,11 +11,13 @@ export class ServerUtils
     }
     public static async load(schema: string, json: string)
     {
-        return await ApiUtils.run<{ schemaContent: string, value: any }>("/api", {
+        const result = await ApiUtils.run<{ schemaContent: string, value: any, schema: Schema }>("/api", {
             command: "load",
             schema,
             json
         });
+        if (!result.body.schemaContent) return null;
+        result.body.schema = Schema.parseSchema(schema, result.body.schemaContent)[0];
     }
     public static async save(schema: string, json: string, value: any)
     {

@@ -46,8 +46,8 @@ export class Schema
     public static parseSchema(file: string, content: string, result?: Schema[])
     {
         if (!result) result = [];
-        const addJsonSchema = (name: string, jsonSchema: JsonSchemaProperty) => Schema.addJsonSchema(result ?? [], content, file, name, jsonSchema);
-        const addTsch = (name: string, tsch: TschType<any, any>) => Schema.addTsch(result ?? [], content, file, name, tsch);
+        const addJsonSchema = (name: string, jsonSchema: JsonSchemaProperty) => Schema.addJsonSchema(result ?? [], file, content, name, jsonSchema);
+        const addTsch = (name: string, tsch: TschType<any, any>) => Schema.addTsch(result ?? [], file, content, name, tsch);
         const tsch = tsch_global;
 
         try
