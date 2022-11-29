@@ -38,32 +38,134 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Client = void 0;
 var ServerUtils_1 = require("./ServerUtils");
+var JsonTool_1 = require("json-tool/js/JsonTool");
 var Client = /** @class */ (function () {
     function Client() {
+        var _this = this;
         this.schemas = {};
+        this.schema = null;
+        this.jsonTool = null;
+        this.schemaFile = null;
+        this.jsonFile = null;
         var menu = document.querySelector("#menu");
+        this.jsonToolRoot = document.querySelector("#json-tool");
         this.select = document.createElement("select");
         menu.appendChild(this.select);
-        this.loadFiles();
+        this.select.onchange = function () { return _this.onFileChange(); };
+        this.buttons = document.createElement("div");
+        var save = document.createElement("button");
+        save.innerText = "Save changes";
+        save.onclick = function () { return _this.save(); };
+        var close = document.createElement("button");
+        close.innerText = "Discard changes";
+        close.onclick = function () { return _this.close(); };
+        this.buttons.appendChild(save);
+        this.buttons.appendChild(close);
+        menu.appendChild(this.buttons);
+        this.setJsonToolVisible(false);
     }
+    Client.prototype.close = function () {
+        this.setJsonToolVisible(false);
+    };
+    Client.prototype.setJsonToolVisible = function (visible) {
+        var _a;
+        this.select.style.display = !visible ? "" : "none";
+        this.buttons.style.display = visible ? "" : "none";
+        if (!visible) {
+            (_a = this.jsonTool) === null || _a === void 0 ? void 0 : _a.hide();
+            this.loadFiles();
+        }
+    };
+    Client.prototype.onFileChange = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            var value, split, schema, json;
+            return __generator(this, function (_a) {
+                value = this.select.value;
+                split = value.split("@");
+                schema = split[0];
+                json = split[1];
+                this.loadFile(schema, json);
+                return [2 /*return*/];
+            });
+        });
+    };
+    Client.prototype.loadFile = function (schema, json) {
+        return __awaiter(this, void 0, void 0, function () {
+            var result, jsonSchema;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, ServerUtils_1.ServerUtils.load(schema, json)];
+                    case 1:
+                        result = _a.sent();
+                        if (result.body.schema) {
+                            this.schema = result.body.schema;
+                            jsonSchema = result.body.schema.getJsonSchema();
+                            if (jsonSchema) {
+                                this.schemaFile = schema;
+                                this.jsonFile = json;
+                                this.setJsonToolVisible(true);
+                                this.jsonTool = new JsonTool_1.JsonTool(this.jsonToolRoot);
+                                this.jsonTool.load(jsonSchema, result.body.value, function (v) { return result.body.schema.validate(v); });
+                            }
+                        }
+                        return [2 /*return*/];
+                }
+            });
+        });
+    };
+    Client.prototype.save = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            var value, result;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        if (!this.schema)
+                            return [2 /*return*/];
+                        if (!this.jsonTool)
+                            return [2 /*return*/];
+                        if (!this.jsonFile)
+                            return [2 /*return*/];
+                        if (!this.schemaFile)
+                            return [2 /*return*/];
+                        value = this.jsonTool.getValue();
+                        if (!this.schema.validate(value).valid)
+                            return [2 /*return*/, alert("Please fix all errors before saving!")];
+                        return [4 /*yield*/, ServerUtils_1.ServerUtils.save(this.schemaFile, this.jsonFile, value)];
+                    case 1:
+                        result = _a.sent();
+                        if (result.status === 200) {
+                            this.setJsonToolVisible(false);
+                        }
+                        else {
+                            alert("Failed to save: ".concat(result.body.msg));
+                        }
+                        return [2 /*return*/];
+                }
+            });
+        });
+    };
     Client.prototype.loadFiles = function () {
         return __awaiter(this, void 0, void 0, function () {
-            var result, _i, _a, files, _b, files_1, file, option;
-            return __generator(this, function (_c) {
-                switch (_c.label) {
+            var result, defaultOption, schema, _i, _a, file, option;
+            return __generator(this, function (_b) {
+                switch (_b.label) {
                     case 0: return [4 /*yield*/, ServerUtils_1.ServerUtils.list()];
                     case 1:
-                        result = _c.sent();
+                        result = _b.sent();
                         if (result.status !== 200)
                             return [2 /*return*/];
-                        console.log(result);
                         this.schemas = result.body.schemas;
                         this.select.innerHTML = "";
-                        for (_i = 0, _a = Object.values(this.schemas); _i < _a.length; _i++) {
-                            files = _a[_i];
-                            for (_b = 0, files_1 = files; _b < files_1.length; _b++) {
-                                file = files_1[_b];
+                        defaultOption = document.createElement("option");
+                        defaultOption.disabled = true;
+                        defaultOption.selected = true;
+                        defaultOption.innerText = "==Choose file==";
+                        this.select.appendChild(defaultOption);
+                        for (schema in this.schemas) {
+                            for (_i = 0, _a = this.schemas[schema]; _i < _a.length; _i++) {
+                                file = _a[_i];
                                 option = document.createElement("option");
+                                option.value = "".concat(schema, "@").concat(file);
                                 option.innerText = file;
                                 this.select.appendChild(option);
                             }

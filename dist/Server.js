@@ -101,7 +101,7 @@ var Server = /** @class */ (function () {
                             res.json(json);
                         };
                         if (!json.command)
-                            return [2 /*return*/, no()];
+                            return [2 /*return*/, no({ msg: "Missing arg command!" })];
                         if (!(json.command === "list")) return [3 /*break*/, 6];
                         files = {};
                         return [4 /*yield*/, SchemaUtils_1.SchemaUtils.getSchemas()];
@@ -136,12 +136,12 @@ var Server = /** @class */ (function () {
                     case 7:
                         schemas = _b.sent();
                         if (schemas.length < 1)
-                            return [2 /*return*/, no()];
+                            return [2 /*return*/, no({ msg: "Unknown schema..." })];
                         schema = schemas[0];
                         return [4 /*yield*/, SchemaUtils_1.SchemaUtils.hasJson(schema, json.json)];
                     case 8:
-                        if (_b.sent())
-                            return [2 /*return*/, no()];
+                        if (!(_b.sent()))
+                            return [2 /*return*/, no({ msg: "Unknown json file..." })];
                         return [4 /*yield*/, SchemaUtils_1.SchemaUtils.getJson(schema, json.json)];
                     case 9:
                         value = _b.sent();
@@ -149,23 +149,23 @@ var Server = /** @class */ (function () {
                     case 10:
                         if (!(json.command === "save")) return [3 /*break*/, 14];
                         if (typeof json.schema !== "string")
-                            return [2 /*return*/, no()];
+                            return [2 /*return*/, no({ msg: "Missing arg schema" })];
                         if (typeof json.json !== "string")
-                            return [2 /*return*/, no()];
-                        if (typeof json.value !== "undefined")
-                            return [2 /*return*/, no()];
+                            return [2 /*return*/, no({ msg: "Missing arg string" })];
+                        if (typeof json.value === "undefined")
+                            return [2 /*return*/, no({ msg: "Missing arg value" })];
                         return [4 /*yield*/, SchemaUtils_1.SchemaUtils.getSchemas([json.schema])];
                     case 11:
                         schemas = _b.sent();
                         if (schemas.length < 1)
-                            return [2 /*return*/, no()];
+                            return [2 /*return*/, no({ msg: "Unkonwn schema" })];
                         schema = schemas[0];
                         return [4 /*yield*/, SchemaUtils_1.SchemaUtils.hasJson(schema, json.json)];
                     case 12:
-                        if (_b.sent())
-                            return [2 /*return*/, no()];
+                        if (!(_b.sent()))
+                            return [2 /*return*/, no({ msg: "Unknown json file..." })];
                         if (!schema.validate(json.value).valid)
-                            no();
+                            no({ msg: "Value isn't valid..." });
                         return [4 /*yield*/, SchemaUtils_1.SchemaUtils.setJson(schema, json.json, json.value)];
                     case 13:
                         _b.sent();

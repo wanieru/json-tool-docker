@@ -1,6 +1,6 @@
 export class ApiUtils
 {
-    public static async run<T>(url: string, json: any): Promise<{ status: number, body: T }>
+    public static async run<T>(url: string, json: any): Promise<{ status: number, body: T & { msg?: string } }>
     {
         const rawResponse = await fetch(url, {
             method: 'POST',

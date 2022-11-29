@@ -16,8 +16,9 @@ export class ServerUtils
             schema,
             json
         });
-        if (!result.body.schemaContent) return null;
+        if (!result.body.schemaContent) return result;
         result.body.schema = Schema.parseSchema(schema, result.body.schemaContent)[0];
+        return result;
     }
     public static async save(schema: string, json: string, value: any)
     {

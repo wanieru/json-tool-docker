@@ -1,6 +1,7 @@
 import { JsonSchemaProperty } from "tsch/dist/JsonSchemaProperty";
 import { TschType } from "tsch/dist/TschType";
 import { tsch as tsch_global } from "tsch";
+import Ajv from "ajv";
 
 export class Schema
 {
@@ -35,6 +36,14 @@ export class Schema
     public validate(value: any)
     {
         if (!!this.tsch) return this.tsch.validate(value);
+        if (!!this.jsonSchema)
+        {
+            const ajv = new Ajv();
+            const validate = ajv.compile(this.jsonSchema);
+            const valid = validate(value);
+            const errors = valid ? [] : (validate.errors ?? []).map(v => `${v.dataPath} ${v.message ?? ""}`);
+            return { valid: !!valid, errors };
+        }
         return { valid: true, errors: [] };
     }
     public getJsonSchema()

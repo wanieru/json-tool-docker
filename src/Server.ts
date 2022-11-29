@@ -30,7 +30,7 @@ export class Server
         const ok = (json: any = {}) => { res.status(200); res.json(json) };
 
         if (!json.command)
-            return no();
+            return no({ msg: "Missing arg command!" });
 
         if (json.command === "list")
         {
@@ -53,22 +53,22 @@ export class Server
             if (typeof json.schema !== "string") return no();
             if (typeof json.json !== "string") return no();
             const schemas = await SchemaUtils.getSchemas([json.schema]);
-            if (schemas.length < 1) return no();
+            if (schemas.length < 1) return no({ msg: "Unknown schema..." });
             const schema = schemas[0];
-            if (await SchemaUtils.hasJson(schema, json.json)) return no();
+            if (!(await SchemaUtils.hasJson(schema, json.json))) return no({ msg: "Unknown json file..." });
             const value = await SchemaUtils.getJson(schema, json.json);
             return ok({ schemaContent: schema.getSchemaContent(), value: value });
         }
         if (json.command === "save")
         {
-            if (typeof json.schema !== "string") return no();
-            if (typeof json.json !== "string") return no();
-            if (typeof json.value !== "undefined") return no();
+            if (typeof json.schema !== "string") return no({ msg: "Missing arg schema" });
+            if (typeof json.json !== "string") return no({ msg: "Missing arg string" });
+            if (typeof json.value === "undefined") return no({ msg: "Missing arg value" });
             const schemas = await SchemaUtils.getSchemas([json.schema]);
-            if (schemas.length < 1) return no();
+            if (schemas.length < 1) return no({ msg: "Unkonwn schema" });
             const schema = schemas[0];
-            if (await SchemaUtils.hasJson(schema, json.json)) return no();
-            if (!schema.validate(json.value).valid) no();
+            if (!(await SchemaUtils.hasJson(schema, json.json))) return no({ msg: "Unknown json file..." });
+            if (!schema.validate(json.value).valid) no({ msg: "Value isn't valid..." });
             await SchemaUtils.setJson(schema, json.json, json.value);
             return ok();
         }

@@ -67,9 +67,9 @@ var ServerUtils = /** @class */ (function () {
                     case 1:
                         result = _a.sent();
                         if (!result.body.schemaContent)
-                            return [2 /*return*/, null];
+                            return [2 /*return*/, result];
                         result.body.schema = Schema_1.Schema.parseSchema(schema, result.body.schemaContent)[0];
-                        return [2 /*return*/];
+                        return [2 /*return*/, result];
                 }
             });
         });

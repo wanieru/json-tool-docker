@@ -1,7 +1,11 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Schema = void 0;
 var tsch_1 = require("tsch");
+var ajv_1 = __importDefault(require("ajv"));
 var Schema = /** @class */ (function () {
     function Schema(schemaFile, schemaContent, name, jsonSchema, tsch) {
         this.schemaFile = schemaFile;
@@ -20,8 +24,16 @@ var Schema = /** @class */ (function () {
         return this.regex;
     };
     Schema.prototype.validate = function (value) {
+        var _a;
         if (!!this.tsch)
             return this.tsch.validate(value);
+        if (!!this.jsonSchema) {
+            var ajv = new ajv_1.default();
+            var validate = ajv.compile(this.jsonSchema);
+            var valid = validate(value);
+            var errors = valid ? [] : ((_a = validate.errors) !== null && _a !== void 0 ? _a : []).map(function (v) { var _a; return "".concat(v.dataPath, " ").concat((_a = v.message) !== null && _a !== void 0 ? _a : ""); });
+            return { valid: !!valid, errors: errors };
+        }
         return { valid: true, errors: [] };
     };
     Schema.prototype.getJsonSchema = function () {
