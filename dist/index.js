@@ -36,14 +36,12 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var Schema_1 = require("./Schema");
 var Server_1 = require("./Server");
 function run() {
     var _a;
     return __awaiter(this, void 0, void 0, function () {
         var server;
         return __generator(this, function (_b) {
-            Schema_1.Schema.getSchemas().then(function (s) { return console.log(s); });
             server = new Server_1.Server(parseInt((_a = process.env["PORT"]) !== null && _a !== void 0 ? _a : "") || 5000);
             return [2 /*return*/];
         });

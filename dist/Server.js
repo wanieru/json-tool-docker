@@ -65,7 +65,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Server = void 0;
 var express = __importStar(require("express"));
 var hat_1 = __importDefault(require("hat"));
-var Schema_1 = require("./Schema");
+var SchemaUtils_1 = require("./SchemaUtils");
 var Server = /** @class */ (function () {
     function Server(port) {
         var _this = this;
@@ -85,7 +85,7 @@ var Server = /** @class */ (function () {
     };
     Server.prototype.api = function (req, res) {
         return __awaiter(this, void 0, void 0, function () {
-            var json, no, ok, files, schemas, _i, schemas_1, schema, arr, jsons, _a, jsons_1, json_1;
+            var json, no, ok, files, schemas, _i, schemas_1, schema, arr, jsons, _a, jsons_1, json_1, schemas, schema, value, schemas, schema;
             return __generator(this, function (_b) {
                 switch (_b.label) {
                     case 0:
@@ -104,7 +104,7 @@ var Server = /** @class */ (function () {
                             return [2 /*return*/, no()];
                         if (!(json.command === "list")) return [3 /*break*/, 6];
                         files = {};
-                        return [4 /*yield*/, Schema_1.Schema.getSchemas()];
+                        return [4 /*yield*/, SchemaUtils_1.SchemaUtils.getSchemas()];
                     case 1:
                         schemas = _b.sent();
                         _i = 0, schemas_1 = schemas;
@@ -114,7 +114,7 @@ var Server = /** @class */ (function () {
                         schema = schemas_1[_i];
                         arr = [];
                         files[schema.getSchemaFile()] = arr;
-                        return [4 /*yield*/, schema.getJsons()];
+                        return [4 /*yield*/, SchemaUtils_1.SchemaUtils.getJsons(schema)];
                     case 3:
                         jsons = _b.sent();
                         for (_a = 0, jsons_1 = jsons; _a < jsons_1.length; _a++) {
@@ -127,9 +127,50 @@ var Server = /** @class */ (function () {
                         return [3 /*break*/, 2];
                     case 5: return [2 /*return*/, ok({ schemas: files })];
                     case 6:
-                        if (json.command === "load")
-                            return [2 /*return*/, ok()];
-                        return [2 /*return*/];
+                        if (!(json.command === "load")) return [3 /*break*/, 10];
+                        if (typeof json.schema !== "string")
+                            return [2 /*return*/, no()];
+                        if (typeof json.json !== "string")
+                            return [2 /*return*/, no()];
+                        return [4 /*yield*/, SchemaUtils_1.SchemaUtils.getSchemas([json.schema])];
+                    case 7:
+                        schemas = _b.sent();
+                        if (schemas.length < 1)
+                            return [2 /*return*/, no()];
+                        schema = schemas[0];
+                        return [4 /*yield*/, SchemaUtils_1.SchemaUtils.hasJson(schema, json.json)];
+                    case 8:
+                        if (_b.sent())
+                            return [2 /*return*/, no()];
+                        return [4 /*yield*/, SchemaUtils_1.SchemaUtils.getJson(schema, json.json)];
+                    case 9:
+                        value = _b.sent();
+                        return [2 /*return*/, ok({ schemaContent: schema.getSchemaContent(), value: value })];
+                    case 10:
+                        if (!(json.command === "save")) return [3 /*break*/, 14];
+                        if (typeof json.schema !== "string")
+                            return [2 /*return*/, no()];
+                        if (typeof json.json !== "string")
+                            return [2 /*return*/, no()];
+                        if (typeof json.value !== "undefined")
+                            return [2 /*return*/, no()];
+                        return [4 /*yield*/, SchemaUtils_1.SchemaUtils.getSchemas([json.schema])];
+                    case 11:
+                        schemas = _b.sent();
+                        if (schemas.length < 1)
+                            return [2 /*return*/, no()];
+                        schema = schemas[0];
+                        return [4 /*yield*/, SchemaUtils_1.SchemaUtils.hasJson(schema, json.json)];
+                    case 12:
+                        if (_b.sent())
+                            return [2 /*return*/, no()];
+                        if (!schema.validate(json.value).valid)
+                            no();
+                        return [4 /*yield*/, SchemaUtils_1.SchemaUtils.setJson(schema, json.json, json.value)];
+                    case 13:
+                        _b.sent();
+                        return [2 /*return*/, ok()];
+                    case 14: return [2 /*return*/, no()];
                 }
             });
         });

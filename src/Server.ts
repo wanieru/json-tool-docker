@@ -1,6 +1,7 @@
 import * as express from 'express';
 import hat from 'hat';
-import { Schema } from './Schema';
+import { SchemaUtils } from './SchemaUtils';
+import { Schema } from './www/Schema';
 
 export class Server
 {
@@ -34,12 +35,12 @@ export class Server
         if (json.command === "list")
         {
             const files = {} as Record<string, string[]>;
-            const schemas = await Schema.getSchemas();
+            const schemas = await SchemaUtils.getSchemas();
             for (const schema of schemas)
             {
                 const arr = [] as string[];
                 files[schema.getSchemaFile()] = arr;
-                const jsons = await schema.getJsons();
+                const jsons = await SchemaUtils.getJsons(schema);
                 for (const json of jsons)
                 {
                     arr.push(json);
@@ -48,7 +49,30 @@ export class Server
             return ok({ schemas: files });
         }
         if (json.command === "load")
-
+        {
+            if (typeof json.schema !== "string") return no();
+            if (typeof json.json !== "string") return no();
+            const schemas = await SchemaUtils.getSchemas([json.schema]);
+            if (schemas.length < 1) return no();
+            const schema = schemas[0];
+            if (await SchemaUtils.hasJson(schema, json.json)) return no();
+            const value = await SchemaUtils.getJson(schema, json.json);
+            return ok({ schemaContent: schema.getSchemaContent(), value: value });
+        }
+        if (json.command === "save")
+        {
+            if (typeof json.schema !== "string") return no();
+            if (typeof json.json !== "string") return no();
+            if (typeof json.value !== "undefined") return no();
+            const schemas = await SchemaUtils.getSchemas([json.schema]);
+            if (schemas.length < 1) return no();
+            const schema = schemas[0];
+            if (await SchemaUtils.hasJson(schema, json.json)) return no();
+            if (!schema.validate(json.value).valid) no();
+            await SchemaUtils.setJson(schema, json.json, json.value);
             return ok();
+        }
+
+        return no();
     }
 }

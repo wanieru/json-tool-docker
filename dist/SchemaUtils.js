@@ -36,49 +36,38 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Schema = void 0;
+exports.SchemaUtils = void 0;
 var FsWrap_1 = require("./Utils/FsWrap");
-var tsch_1 = require("tsch");
-var Schema = /** @class */ (function () {
-    function Schema(schemaFile, schemaContent, name, jsonSchema, tsch) {
-        this.schemaFile = schemaFile;
-        this.schemaContent = schemaContent;
-        this.regex = Schema.getRegex(name);
-        this.jsonSchema = jsonSchema;
-        this.tsch = tsch;
+var Schema_1 = require("./www/Schema");
+var SchemaUtils = /** @class */ (function () {
+    function SchemaUtils() {
     }
-    Schema.prototype.getSchemaFile = function () {
-        return this.schemaFile;
-    };
-    Schema.prototype.getSchemaContent = function () {
-        return this.schemaContent;
-    };
-    Schema.prototype.getJsons = function () {
+    SchemaUtils.getJsons = function (schema) {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, FsWrap_1.FsWrap.getAllFilesInDir("./jsons", this.regex)];
+                    case 0: return [4 /*yield*/, FsWrap_1.FsWrap.getAllFilesInDir("./jsons", schema.getRegex())];
                     case 1: return [2 /*return*/, _a.sent()];
                 }
             });
         });
     };
-    Schema.prototype.hasJson = function (file) {
+    SchemaUtils.hasJson = function (schema, file) {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, this.getJsons()];
+                    case 0: return [4 /*yield*/, SchemaUtils.getJsons(schema)];
                     case 1: return [2 /*return*/, (_a.sent()).includes(file)];
                 }
             });
         });
     };
-    Schema.prototype.getJson = function (file) {
+    SchemaUtils.getJson = function (schema, file) {
         return __awaiter(this, void 0, void 0, function () {
             var json, e_1;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, this.getJsons()];
+                    case 0: return [4 /*yield*/, SchemaUtils.getJsons(schema)];
                     case 1:
                         if (!(_a.sent()).includes(file))
                             return [2 /*return*/, null];
@@ -97,33 +86,7 @@ var Schema = /** @class */ (function () {
             });
         });
     };
-    Schema.prototype.setJson = function (file, value) {
-        return __awaiter(this, void 0, void 0, function () {
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0: return [4 /*yield*/, this.getJsons()];
-                    case 1:
-                        if (!(_a.sent()).includes(file))
-                            return [2 /*return*/];
-                        return [4 /*yield*/, FsWrap_1.FsWrap.saveFile(file, JSON.stringify(value, null, 3))];
-                    case 2:
-                        _a.sent();
-                        return [2 /*return*/];
-                }
-            });
-        });
-    };
-    Schema.prototype.validate = function (value) {
-        if (!!this.tsch)
-            return this.tsch.validate(value);
-        return { valid: true, errors: [] };
-    };
-    Schema.prototype.getJsonSchema = function () {
-        if (!!this.tsch)
-            return this.tsch.getJsonSchemaProperty();
-        return this.jsonSchema;
-    };
-    Schema.getSchemas = function (files) {
+    SchemaUtils.getSchemas = function (files) {
         return __awaiter(this, void 0, void 0, function () {
             var result, schemaFiles;
             var _this = this;
@@ -150,7 +113,7 @@ var Schema = /** @class */ (function () {
                                             return [4 /*yield*/, FsWrap_1.FsWrap.loadFile(file)];
                                         case 2:
                                             content = _a.sent();
-                                            Schema.parseSchema(file, content, result);
+                                            Schema_1.Schema.parseSchema(file, content, result);
                                             _a.label = 3;
                                         case 3:
                                             _i++;
@@ -166,32 +129,22 @@ var Schema = /** @class */ (function () {
             });
         });
     };
-    Schema.parseSchema = function (file, content, result) {
-        if (!result)
-            result = [];
-        var addJsonSchema = function (name, jsonSchema) { return Schema.addJsonSchema(result !== null && result !== void 0 ? result : [], content, file, name, jsonSchema); };
-        var addTsch = function (name, tsch) { return Schema.addTsch(result !== null && result !== void 0 ? result : [], content, file, name, tsch); };
-        var tsch = tsch_1.tsch;
-        try {
-            "use strict";
-            eval(content);
-        }
-        catch (e) {
-            console.warn("Exception during ".concat(file), e);
-        }
-        return result;
+    SchemaUtils.setJson = function (schema, file, value) {
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, SchemaUtils.getJsons(schema)];
+                    case 1:
+                        if (!(_a.sent()).includes(file))
+                            return [2 /*return*/];
+                        return [4 /*yield*/, FsWrap_1.FsWrap.saveFile(file, JSON.stringify(value, null, 3))];
+                    case 2:
+                        _a.sent();
+                        return [2 /*return*/];
+                }
+            });
+        });
     };
-    Schema.getRegex = function (name) {
-        return new RegExp("^" + name.split("*")
-            .map(function (s) { return s.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&'); })
-            .join(".*") + "$");
-    };
-    Schema.addJsonSchema = function (schemas, schemaFile, content, name, jsonSchema) {
-        schemas.push(new Schema(schemaFile, content, name, jsonSchema));
-    };
-    Schema.addTsch = function (schemas, schemaFile, content, name, tsch) {
-        schemas.push(new Schema(schemaFile, content, name, undefined, tsch));
-    };
-    return Schema;
+    return SchemaUtils;
 }());
-exports.Schema = Schema;
+exports.SchemaUtils = SchemaUtils;
