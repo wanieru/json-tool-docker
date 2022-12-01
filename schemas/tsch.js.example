@@ -18,4 +18,6 @@ const person = tsch.object({
         name: tsch.string()
     }).title("Pet")).unique().table().default([{ type: "dog", name: "Walter" }])
 }).title("Person");
+
+//Apply "person"-tsch to all files in "./jsons" which matches "person*.json"
 addTsch("person*.json", person);
