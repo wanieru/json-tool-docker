@@ -1,10 +1,10 @@
 {
   "name": "json-tool-docker",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "json-tool-docker",
   "scripts": {
     "start": "node dist/index.js",
-    "build": "tsc",
+    "build": "npm i && tsc && webpack --mode=production",
     "watch": "tsc --watch",
     "webpack-d": "webpack --mode=development --watch",
     "webpack-p": "webpack --mode=production"
