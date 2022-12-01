@@ -1,3 +1,4 @@
 node_modules
 schemas/*.js
+!schemas/*.example.js
 jsons
