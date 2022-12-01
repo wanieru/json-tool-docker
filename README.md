@@ -4,7 +4,7 @@ Docker Image which provides a Web UI for editing local JSON-files according to c
 
 Simply create `.js`-files in the `schemas` volume to define the schemas and which .json-files they should be used for, and put `.json`-files in the `jsons` volume.
 
-The schemas directory contains a couple of examples.
+[The schemas directory contains a couple of examples.](https://github.com/wanieru/json-tool-docker/tree/main/schemas)
 
 ```yml
 {
