@@ -20,5 +20,5 @@ var schema = {
     }
 }
 
-//Apply "schema" to all files in "./jsons" which matches "*.json"
-addJsonSchema("*.json", schema);
+//Apply "schema" to all files in "./jsons" which matches "example*.json"
+addJsonSchema("example*.json", schema);
